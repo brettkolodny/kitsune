@@ -1,7 +1,7 @@
 extern crate structopt;
 mod utility;
 
-use indicatif::{ProgressBar};
+use indicatif::{ProgressBar, ProgressStyle};
 use rand::Rng;
 use std::{thread, time};
 use structopt::StructOpt;
@@ -26,6 +26,7 @@ fn main() {
 
     if let true = matches.compile {
         let mut rng = rand::thread_rng();
+        bar.set_style(ProgressStyle::default_bar().progress_chars("#>-"));
 
         let mut time_since_inc: u128 = 0;
         while start_time.elapsed().as_millis() < t || num_times_inc < 100 {
