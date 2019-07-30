@@ -5,6 +5,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use rand::Rng;
 use std::{thread, time};
 use structopt::StructOpt;
+use console::{style, Term};
 
 #[derive(StructOpt, Debug)]
 struct Opt {
@@ -26,13 +27,22 @@ fn main() {
 
     if let true = matches.compile {
         let mut rng = rand::thread_rng();
-        bar.set_style(ProgressStyle::default_bar().progress_chars("#>-"));
+
+        let template_string = {
+            let num_rows = Term::stdout().size().0 * 2;
+
+            let bar_string = format!("{}{}{}{}", "{", "bar:", num_rows, "}");
+            format!("{} {}{}{}", style("Building").cyan(), "[", bar_string, "]")
+        };
+
+        bar.set_style(ProgressStyle::default_bar().template(template_string.as_str()).progress_chars("#>-"));
 
         let mut time_since_inc: u128 = 0;
         while start_time.elapsed().as_millis() < t || num_times_inc < 100 {
             let start_loop_time = time::Instant::now();
             let compile_message = format!(
-                "Compiling: {}_{} v{}.{}.{}",
+                "  {}: {}_{} v{}.{}.{}",
+                style("Compiling").bold().dim(),
                 utility::ADJECTIVES[(rng.gen_range(0, utility::ADJECTIVES_LENGTH)) as usize],
                 utility::NOUNS[(rng.gen_range(0, utility::NOUNS_LENGTH)) as usize],
                 rng.gen_range(0, 15),
