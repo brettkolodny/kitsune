@@ -7,7 +7,7 @@ Kitsune is a CLI for generating fake progress bars in various styles that take a
 Install using cargo:
 
 ```
-cargo install --git https://github.com/brettkolodny/kitsune
+cargo install kitsune
 ```
 
 Run with:
