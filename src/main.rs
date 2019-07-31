@@ -1,11 +1,11 @@
 extern crate structopt;
 mod utility;
 
+use console::{style, Term};
 use indicatif::{ProgressBar, ProgressStyle};
-use rand::Rng;
+use rand::{Rng, rngs::ThreadRng};
 use std::{thread, time};
 use structopt::StructOpt;
-use console::{style, Term};
 
 #[derive(StructOpt, Debug)]
 struct Opt {
@@ -26,39 +26,40 @@ fn main() {
     let mut num_times_inc = 0;
 
     if let true = matches.compile {
-        let mut rng = rand::thread_rng();
+        let rng = rand::thread_rng();
 
         let template_string = {
             let num_rows = Term::stdout().size().0 * 2;
 
             let bar_string = format!("{}{}{}{}", "{", "bar:", num_rows, "}");
-            format!("{} {}{}{}", style("Building").cyan(), "[", bar_string, "]")
+            format!(
+                "    {} {}{}{}",
+                style("Building").cyan(),
+                "[",
+                bar_string,
+                "]"
+            )
         };
 
-        bar.set_style(ProgressStyle::default_bar().template(template_string.as_str()).progress_chars("#>-"));
+        bar.set_style(
+            ProgressStyle::default_bar()
+                .template(template_string.as_str())
+                .progress_chars("=> "),
+        );
 
         let mut time_since_inc: u128 = 0;
         while start_time.elapsed().as_millis() < t || num_times_inc < 100 {
             let start_loop_time = time::Instant::now();
-            let compile_message = format!(
-                "  {}: {}_{} v{}.{}.{}",
-                style("Compiling").bold().dim(),
-                utility::ADJECTIVES[(rng.gen_range(0, utility::ADJECTIVES_LENGTH)) as usize],
-                utility::NOUNS[(rng.gen_range(0, utility::NOUNS_LENGTH)) as usize],
-                rng.gen_range(0, 15),
-                rng.gen_range(0, 15),
-                rng.gen_range(1, 15),
-            );
 
             thread::sleep(time::Duration::from_millis(50));
 
             if time_since_inc >= time_per_tick as u128 {
+                bar.println(compile_message(rng));
                 bar.inc(1);
                 time_since_inc = time_since_inc - time_per_tick as u128;
                 num_times_inc += 1;
             }
             time_since_inc += start_loop_time.elapsed().as_millis();
-            bar.println(compile_message);
         }
 
         bar.finish_and_clear();
@@ -70,4 +71,18 @@ fn main() {
     }
 
     println!("Complete");
+}
+
+fn compile_message(mut rng: ThreadRng) -> String {
+    let message = format!(
+        "  {}: {}_{} v{}.{}.{}",
+        style("Compiling").bold().dim(),
+        utility::ADJECTIVES[(rng.gen_range(0, utility::ADJECTIVES_LENGTH)) as usize],
+        utility::NOUNS[(rng.gen_range(0, utility::NOUNS_LENGTH)) as usize],
+        rng.gen_range(0, 15),
+        rng.gen_range(0, 15),
+        rng.gen_range(1, 15),
+    );
+
+    message
 }
