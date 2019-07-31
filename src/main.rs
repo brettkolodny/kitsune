@@ -37,7 +37,7 @@ fn main() {
             let bar_string = format!("{}{}{}{}", "{", "bar:", num_rows, "}");
             format!(
                 "    {} {}{}{}",
-                style("Building").cyan(),
+                style("Building").bold().cyan(),
                 "[",
                 bar_string,
                 "]"
@@ -79,7 +79,7 @@ fn main() {
 fn compile_message(mut rng: ThreadRng) -> String {
     let message = format!(
         "  {}: {}_{} v{}.{}.{}",
-        style("Compiling").bold().dim(),
+        style("Compiling").bold().green(),
         utility::ADJECTIVES[(rng.gen_range(0, utility::ADJECTIVES_LENGTH)) as usize],
         utility::NOUNS[(rng.gen_range(0, utility::NOUNS_LENGTH)) as usize],
         rng.gen_range(0, 15),
