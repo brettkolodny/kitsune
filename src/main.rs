@@ -9,8 +9,11 @@ use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
 struct Opt {
+    /// Amount of time progress bar takes to complete
     #[structopt(long = "time", short = "t")]
     time: u128,
+
+    /// Changes progress bar to look like compiler
     #[structopt(long = "compile", short = "c")]
     compile: bool,
 }
